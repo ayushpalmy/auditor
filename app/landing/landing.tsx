@@ -39,7 +39,7 @@ export default function LandingPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full opacity-20 blur-md group-hover:opacity-40 transition-opacity duration-300" />
             </div>
-            <ColoredText className="text-2xl font-bold">TaxHacker</ColoredText>
+            <ColoredText className="text-2xl font-bold">Auditor</ColoredText>
           </Link>
           <div className="flex gap-1 md:gap-4 text-xs md:text-sm">
             <Link
@@ -88,7 +88,7 @@ export default function LandingPage() {
           <div className="relative aspect-auto rounded-3xl overflow-hidden shadow-2xl shadow-orange-900/15 ring-1 ring-orange-100">
             <video className="w-full h-auto" autoPlay loop muted playsInline poster="/landing/ai-scanner-big.webp">
               <source src="/landing/video.mp4" type="video/mp4" />
-              <Image src="/landing/ai-scanner-big.webp" alt="TaxHacker" width={1728} height={1080} priority />
+              <Image src="/landing/ai-scanner-big.webp" alt="Auditor" width={1728} height={1080} priority />
             </video>
           </div>
         </div>
@@ -103,7 +103,7 @@ export default function LandingPage() {
                 F∗ck Taxes
               </span>
               <span className="text-4xl font-bold text-gray-900">
-                TaxHacker saves you time, money and nerves
+                Auditor saves you time, money and nerves
               </span>
             </h2>
           </div>
@@ -250,7 +250,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center">
                   <span className="text-orange-500 mr-3 text-lg">🔧</span>
-                  Expand and improve your TaxHacker instance with custom LLM prompts
+                  Expand and improve your Auditor instance with custom LLM prompts
                 </li>
                 <li className="flex items-center">
                   <span className="text-orange-500 mr-3 text-lg">🔧</span>
@@ -283,7 +283,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center">
                   <span className="text-orange-500 mr-3 text-lg">📤</span>
-                  Deploy your own instance of TaxHacker for 100% privacy
+                  Deploy your own instance of Auditor for 100% privacy
                 </li>
                 <li className="flex items-center">
                   <span className="text-orange-500 mr-3 text-lg">📤</span>
@@ -315,7 +315,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              Choose Your Version of <ColoredText>TaxHacker</ColoredText>
+              Choose Your Version of <ColoredText>Auditor</ColoredText>
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-16">

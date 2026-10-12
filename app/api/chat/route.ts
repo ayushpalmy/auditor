@@ -31,7 +31,9 @@ function sanitizeMessages(raw: unknown): ChatTurn[] | null {
     // Bound size to keep prompts small and avoid abuse.
     out.push({ role, content: trimmed.slice(0, 4000) })
   }
-  return out
+  // Bound session length too: only the most recent turns are ever needed and
+  // this caps prompt size / provider cost regardless of client input.
+  return out.slice(-20)
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<ChatResponse>> {

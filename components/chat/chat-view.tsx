@@ -297,7 +297,7 @@ export function ChatView() {
         <Info className="h-4 w-4" />
         <AlertTitle>Grounded in your records</AlertTitle>
         <AlertDescription>
-          Answers are generated from your own TaxHacker records only and may be incomplete. This is
+          Answers are generated from your own Auditor records only and may be incomplete. This is
           not tax, legal, or accounting advice.
         </AlertDescription>
       </Alert>

@@ -7,7 +7,7 @@ export const NO_RECORDS_TOKEN = "NO_RECORDS_FOUND"
 
 export function buildSystemPrompt(): string {
   return [
-    "You are TaxHacker's accounting assistant.",
+    "You are Auditor's accounting assistant.",
     "You answer strictly using the RETRIEVED RECORDS supplied by the system. These records belong only to the current authenticated user.",
     "",
     "Rules:",

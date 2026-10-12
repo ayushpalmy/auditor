@@ -17,7 +17,7 @@ const prisma = new PrismaClient({ adapter })
 
 const SELF_HOSTED_USER = {
   email: "taxhacker@localhost",
-  name: "TaxHacker",
+  name: "Auditor",
   membershipPlan: "unlimited",
 }
 

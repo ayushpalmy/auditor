@@ -4,7 +4,7 @@
 
 <br>
 
-# TaxHacker: Self-Hosted AI Accounting
+# Auditor: Self-Hosted AI Accounting
 
 [![GitHub Stars](https://img.shields.io/github/stars/vas3k/TaxHacker?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/vas3k/TaxHacker/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-ffcb47?labelColor=black&style=flat-square)](https://github.com/vas3k/TaxHacker/blob/main/LICENSE)
@@ -15,11 +15,11 @@
 > [!NOTE]
 > ☝️ I'm currently looking for a job! Particularly interested in companies in Berlin or remote positions in Germany. Here's [my CV](https://raw.githubusercontent.com/vas3k/vas3k/master/cv.pdf) and [Linkedin profile](https://www.linkedin.com/in/vas3k/). Thank you 🙏
 
-TaxHacker is a self-hosted accounting app designed for freelancers, indie-hackers, and small businesses who want to save time and automate expense and income tracking using the power of modern AI.
+Auditor is a self-hosted accounting app designed for freelancers, indie-hackers, and small businesses who want to save time and automate expense and income tracking using the power of modern AI.
 
-Upload photos of receipts, invoices, or PDFs, and TaxHacker will automatically recognize and extract all the important data you need for accounting: product names, amounts, items, dates, merchants, taxes, and save it into a structured Excel-like database. You can even create custom fields with your own AI prompts to extract any specific information you need.
+Upload photos of receipts, invoices, or PDFs, and Auditor will automatically recognize and extract all the important data you need for accounting: product names, amounts, items, dates, merchants, taxes, and save it into a structured Excel-like database. You can even create custom fields with your own AI prompts to extract any specific information you need.
 
-The app features automatic currency conversion (including crypto!) based on historical exchange rates from the transaction date. With built-in filtering, multi-project support, import/export capabilities, and custom categories, TaxHacker simplifies reporting and makes tax filing a bit easier.
+The app features automatic currency conversion (including crypto!) based on historical exchange rates from the transaction date. With built-in filtering, multi-project support, import/export capabilities, and custom categories, Auditor simplifies reporting and makes tax filing a bit easier.
 
 > 🎥 [Watch demo video](https://taxhacker.app/landing/video.mp4)
 
@@ -35,7 +35,7 @@ The app features automatic currency conversion (including crypto!) based on hist
 
 ![Currency Conversion](public/landing/ai-scanner-big.webp)
 
-Snap a photo of any receipt or upload an invoice PDF, and TaxHacker will automatically recognize, extract, categorize, and store all the information in a structured database.
+Snap a photo of any receipt or upload an invoice PDF, and Auditor will automatically recognize, extract, categorize, and store all the information in a structured database.
 
 - **Upload and organize your docs**: Store multiple documents in "unsorted" until you're ready to process them manually or with AI assistance
 - **AI data extraction**: Use AI to automatically pull key information like dates, amounts, vendors, and line items
@@ -44,13 +44,13 @@ Snap a photo of any receipt or upload an invoice PDF, and TaxHacker will automat
 - **Structured storage**: Everything gets saved in an organized database for easy filtering and retrieval
 - **Choose your LLM**: You can use OpenAI, Google Gemini, or Mistral or even your local LLM (in the self-hosted version). Only you're responsible for the quality and privacy of your data.
 
-TaxHacker works with a wide variety of documents, including store receipts, restaurant bills, invoices, bank statements, letters, even handwritten receipts. It handles any language and any currency with ease.
+Auditor works with a wide variety of documents, including store receipts, restaurant bills, invoices, bank statements, letters, even handwritten receipts. It handles any language and any currency with ease.
 
 ### `2` Multi-currency support with automatic conversion (even crypto!)
 
 ![Currency Conversion](public/landing/multi-currency.webp)
 
-TaxHacker automatically detects currencies in your documents and converts them to your base currency using historical exchange rates.
+Auditor automatically detects currencies in your documents and converts them to your base currency using historical exchange rates.
 
 - **Foreight currency detection**: Automatically identify the currency used in any document
 - **Historical rates**: Get conversion rates from the actual transaction date
@@ -67,7 +67,7 @@ It's compatible with your local LLM OpenAI-compatible API endpoint. Just make su
 
 ![Transactions Table](public/landing/transactions-big.webp)
 
-Adapt TaxHacker to your unique needs with unlimited customization options. Create custom fields, projects, and categories that better suit your specific needs, idustry standards or country.
+Adapt Auditor to your unique needs with unlimited customization options. Create custom fields, projects, and categories that better suit your specific needs, idustry standards or country.
 
 - **Custom categories and projecst**: Create your own categories and projects to group your transactions in any convenient way
 - **Custom fields**: You can create unlimited number of custom fields to extraxt more information from your invoices (it's like creating extra columns in Excel)
@@ -80,7 +80,7 @@ Adapt TaxHacker to your unique needs with unlimited customization options. Creat
 
 ![Custom Categories](public/landing/custom-llm.webp)
 
-Take full control of how TaxHacker's AI processes your documents. Write custom AI prompts for fields, categories, and projects, or modify the built-in ones to match your specific needs.
+Take full control of how Auditor's AI processes your documents. Write custom AI prompts for fields, categories, and projects, or modify the built-in ones to match your specific needs.
 
 - **Customizable system prompts**: Modify the general prompt template in settings to suit your business
 - **Field or project-specific prompts**: Create custom extraction rules for your industry-specific documents
@@ -88,7 +88,7 @@ Take full control of how TaxHacker's AI processes your documents. Write custom A
 - **Industry optimization**: Fine-tune the AI to understand your specific type of business documents
 - **Full transparency**: Every aspect of the AI extraction process is under your control and can be changed right in settings
 
-TaxHacker is 100% adaptable and tunable to your unique requirements — whether you need to extract emails, addresses, project codes, or any other custom information from your documents.
+Auditor is 100% adaptable and tunable to your unique requirements — whether you need to extract emails, addresses, project codes, or any other custom information from your documents.
 
 ### `6` Flexible data filtering and export
 
@@ -105,7 +105,7 @@ Once your documents are processed, easily view, filter, and export your complete
 
 ![Self-hosting](docs/screenshots/exported_archive.png)
 
-Keep complete control over your financial data with local storage and self-hosting options. TaxHacker respects your privacy and gives you full ownership of your information.
+Keep complete control over your financial data with local storage and self-hosting options. Auditor respects your privacy and gives you full ownership of your information.
 
 - **Home server ready**: Host on your own infrastructure for maximum privacy and control
 - **Docker native**: Simple setup with provided Docker containers and compose files
@@ -115,7 +115,7 @@ Keep complete control over your financial data with local storage and self-hosti
 
 ## 🛳 Deployment and Self-hosting
 
-TaxHacker can be easily self-hosted on your own infrastructure for complete control over your data and application environment. We provide a [Docker image](./Dockerfile) and [Docker Compose](./docker-compose.yml) setup that makes deployment simple:
+Auditor can be easily self-hosted on your own infrastructure for complete control over your data and application environment. We provide a [Docker image](./Dockerfile) and [Docker Compose](./docker-compose.yml) setup that makes deployment simple:
 
 ```bash
 curl -O https://raw.githubusercontent.com/vas3k/TaxHacker/main/docker-compose.yml
@@ -125,7 +125,7 @@ docker compose up
 
 The Docker Compose setup includes:
 
-- TaxHacker application container
+- Auditor application container
 - PostgreSQL 17+ database (or connect to your existing database)
 - Automatic database migrations on startup
 - Volume mounts for persistent data storage
@@ -155,7 +155,7 @@ services:
 
 ### Environment Variables
 
-Configure TaxHacker for your specific needs with these environment variables:
+Configure Auditor for your specific needs with these environment variables:
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
@@ -165,7 +165,7 @@ Configure TaxHacker for your specific needs with these environment variables:
 | `BASE_URL` | No | Base URL for the application | `http://localhost:7331` |
 | `SELF_HOSTED_MODE` | No | Set to "true" for self-hosting: enables auto-login, custom API keys, and additional features | `true` |
 | `DISABLE_SIGNUP` | No | Disable new user registration on your instance | `false` |
-| `BETTER_AUTH_SECRET` | Recommended | Secret key for authentication and email credential encryption (minimum 16 characters). In self-hosted Docker, TaxHacker auto-generates and persists one in `./data/.better_auth_secret` if unset. | `your-secure-random-key` |
+| `BETTER_AUTH_SECRET` | Recommended | Secret key for authentication and email credential encryption (minimum 16 characters). In self-hosted Docker, Auditor auto-generates and persists one in `./data/.better_auth_secret` if unset. | `your-secure-random-key` |
 | `POSTGRES_PASSWORD` | Yes (`docker-compose.build.yml`) | Password for the bundled Postgres when building locally — used in both `POSTGRES_PASSWORD` and `DATABASE_URL` | output of `openssl rand -hex 24` |
 | `POSTGRES_USER` | No (`docker-compose.build.yml`) | Database user (defaults to `postgres`) | `postgres` |
 | `POSTGRES_DB` | No (`docker-compose.build.yml`) | Database name (defaults to `taxhacker`) | `taxhacker` |
@@ -187,7 +187,7 @@ Set up your local development environment:
 ```bash
 # Clone the repository
 git clone https://github.com/vas3k/TaxHacker.git
-cd TaxHacker
+cd Auditor
 
 # Install dependencies
 npm install
@@ -206,7 +206,7 @@ npx prisma generate && npx prisma migrate dev
 npm run dev
 ```
 
-Visit `http://localhost:7331` to see your local TaxHacker instance in action.
+Visit `http://localhost:7331` to see your local Auditor instance in action.
 
 For a production build, instead of `npm run dev` use the following commands:
 
@@ -226,10 +226,12 @@ No AI-slop PRs. Please open a new Issue and discuss the details with maintainers
 
 ## ❤️ Support the Project
 
-If TaxHacker has helped you save time or manage your finances better, consider supporting its development! Your donations help us maintain the project, add new features, and keep it free and open source. Every contribution helps ensure we can keep improving and maintaining this tool for the community: <https://vas3k.com/donate/>
+If Auditor has helped you save time or manage your finances better, consider supporting its development! Your donations help us maintain the project, add new features, and keep it free and open source. Every contribution helps ensure we can keep improving and maintaining this tool for the community: <https://vas3k.com/donate/>
 
 [![Thank the TaxHacker devs](https://img.shields.io/badge/❤️-donate%20to%20Taxhacker%20devs-f08080?labelColor=black&style=for-the-badge)](https://vas3k.com/donate/)
 
 ## 📄 License
 
-TaxHacker is licensed under the [MIT License](LICENSE).
+Auditor is licensed under the [MIT License](LICENSE).
+
+> Auditor is a rebrand of the open-source **TaxHacker** project by [vas3k](https://github.com/vas3k/TaxHacker). Original copyright and the MIT licence are retained; see [LICENSE](LICENSE).
