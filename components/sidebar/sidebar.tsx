@@ -29,6 +29,7 @@ import {
   Gift,
   House,
   Import,
+  MessageSquare,
   Sparkles,
   Tags,
   Upload,
@@ -107,6 +108,15 @@ export function AppSidebar({
                     <Link href="/dashboard">
                       <House />
                       <span>Home</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItemWithHighlight>
+
+                <SidebarMenuItemWithHighlight href="/chat">
+                  <SidebarMenuButton asChild>
+                    <Link href="/chat">
+                      <MessageSquare />
+                      <span>AI Assistant</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItemWithHighlight>

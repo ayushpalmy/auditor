@@ -2,6 +2,11 @@ import { withSentryConfig } from "@sentry/nextjs"
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: [
+    "*.preview.emergentagent.com",
+    "*.preview.emergentcf.cloud",
+    "*.cluster-7.preview.emergentcf.cloud",
+  ],
   images: {
     unoptimized: true, // FIXME: bug on prod, images always empty, investigate later
   },
