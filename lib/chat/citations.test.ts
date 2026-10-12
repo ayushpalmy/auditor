@@ -33,4 +33,20 @@ describe("splitCitations", () => {
     const segs = splitCitations("entry [#12]")
     expect(segs[1]).toEqual({ type: "citation", index: 12, label: "[#12]" })
   })
+
+  it("expands grouped citations like [#1, #2] into separate segments", () => {
+    const segs = splitCitations("Both [#1, #2] match.")
+    const cites = segs.filter((s) => s.type === "citation") as Array<{ index: number }>
+    expect(cites.map((c) => c.index)).toEqual([1, 2])
+  })
+
+  it("handles comma-joined without spaces [#1,#2]", () => {
+    const cites = splitCitations("see [#1,#2]").filter((s) => s.type === "citation") as Array<{ index: number }>
+    expect(cites.map((c) => c.index)).toEqual([1, 2])
+  })
+
+  it("expands ranges like [#1-#3]", () => {
+    const cites = splitCitations("rows [#1-#3]").filter((s) => s.type === "citation") as Array<{ index: number }>
+    expect(cites.map((c) => c.index)).toEqual([1, 2, 3])
+  })
 })

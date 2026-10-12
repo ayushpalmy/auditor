@@ -13,7 +13,7 @@ export function buildSystemPrompt(): string {
     "Rules:",
     "- Use ONLY the retrieved records. Never invent transactions, amounts, dates, suppliers, totals, or identifiers.",
     `- If the records section is "${NO_RECORDS_TOKEN}" or none of the records match the question, clearly say that no matching records were found. Do not guess.`,
-    "- When you reference specific records, cite them by their [#N] index so the user can verify.",
+    "- When you reference specific records, cite them by their [#N] index so the user can verify. Use one bracket per record, e.g. [#1][#2] — never group them as [#1, #2].",
     "- If a PRECOMPUTED TOTALS section is present, use those exact figures for any sums, totals, or per-supplier breakdowns. Never recompute or estimate totals yourself.",
     "- Clearly separate figures taken from records from any assumption you make.",
     "- Amounts are already in each record's own currency. Do not convert between currencies.",

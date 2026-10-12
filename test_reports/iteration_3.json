@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only test of the two new chat features (clickable [#N] citations + monthly summary table) plus light regression on https://.../chat. Monthly summary feature works end-to-end: data-testid chat-summary-table renders with 3 month-total rows (chat-summary-month-total-0..2) and 4 supplier rows (chat-summary-supplier-row-*). All computed figures match the expected values exactly: March 2026 total $540.74 (Umbrella Supplies $450.75, Office Depot $89.99), January 2026 $120.00 (Globex), November 2025 $2,300.00 (Wayne Enterprises). The grounded answer text also quotes those same numbers. References table renders with the required leading '#' column (headers: #, Date, Supplier, Name, Type, Amount). Clickable citations work when the LLM emits separate [#N] tokens: clicking chat-citation-1 on the summary message smoothly scrolled chat-reference-row-0 into view and applied the amber ring highlight (bg-amber-100 ring-2 ring-amber-400). Regression passes: user bubble (chat-message-user), loading indicator (chat-loading), clear button (chat-clear-button) resets to empty state, disclaimer (chat-disclaimer) visible, non-summary query shows references table. ONE PARTIAL BUG: for the Acme query the LLM emitted the citations as a single joined token '[#1, #2]' instead of '[#1][#2]'; splitCitations regex /\\[#(\\d+)\\]/g does not match that form, so NO citation chips rendered in the Acme assistant message (chat-citation-1/chat-citation-2 absent). The reference table itself still rendered correctly; only the inline clickable chips were missing for that message.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AnswerText / splitCitations",
+        "issue": "Clickable citation chips fail to render when the LLM outputs grouped tokens like '[#1, #2]' (or '[#1,#2]', '[#1-#2]'). Regex /\\[#(\\d+)\\]/g only matches isolated [#N] tokens, so the Acme query answer showed the raw '[#1, #2]' text with no buttons. Fix options: (a) strengthen the system prompt in /app/app/api/chat/route.ts (buildChatPrompt) to require one bracket per citation, e.g. '[#1][#2]' never '[#1, #2]'; (b) extend splitCitations to also parse comma/dash separated groups like '[#1, #2]' or '[#1-#3]' and emit a button per index.",
+        "selector": "[data-testid=chat-citation-1], [data-testid=chat-citation-2]",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix citation rendering for grouped tokens: either tighten the LLM prompt to always emit '[#1][#2]' (one bracket per citation) or extend lib/chat/citations.ts splitCitations to parse '[#1, #2]' / '[#1-#3]' into multiple citation segments. Preferred: do both (prompt + resilient parser) since LLM output is non-deterministic."
+  ],
+  "critical_code_review_comments": [
+    "lib/chat/citations.ts splitCitations is too strict for real LLM output; add tolerance for comma/dash grouped indices.",
+    "components/chat/chat-view.tsx: when a citation index is out of range, it renders as plain text — fine, but consider logging to help future debugging.",
+    "The monthly summary feature is deterministic and correctly separated from the LLM (good: computeMonthlySummaries in lib/chat/summary.ts uses integer cents and dedupes by id)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "90%"},
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All UI data-testids are in place and working. Monthly summary + reference table + highlight-on-click are verified. The only remaining issue is grouped-citation parsing. After the fix lands, re-run the Acme query ('Show me Acme invoices from March over 5,000') and assert chat-citation-1 and chat-citation-2 are both present and both scroll+highlight their matching rows (ref-<messageId>-0 and ref-<messageId>-1).",
+  "rca of the issue": "Root cause: splitCitations in /app/lib/chat/citations.ts uses the regex /\\[#(\\d+)\\]/g which only matches a single-index bracket like '[#1]'. The Claude model (via fal.ai) occasionally condenses multiple adjacent citations into one bracket, e.g. 'Both invoices [#1, #2] match'. That token does not match the regex, so it falls through as plain text and no <button data-testid=chat-citation-N> is created. Reproduction: ask 'Show me Acme invoices from March over 5,000' on /chat; observe the answer text contains the literal '[#1, #2]' but DOM has no chat-citation-* buttons for that message. Mitigation: (1) update buildChatPrompt in /app/app/api/chat/route.ts to explicitly instruct the model to always use one bracket per citation ('always write [#1][#2], never [#1, #2]'); (2) make splitCitations resilient by also matching /\\[#(\\d+(?:\\s*[,\\-]\\s*#?\\d+)*)\\]/g and expanding ranges/lists into individual citation segments."
+}
