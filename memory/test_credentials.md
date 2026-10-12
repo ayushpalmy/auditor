@@ -14,9 +14,10 @@
   (userId). The authenticated user IS the firm boundary.
 
 ## AI provider (Claude via fal.ai)
-- Env vars: `FAL_KEY` (currently EMPTY — must be provided by user), `CLAUDE_MODEL=anthropic/claude-sonnet-4.5`.
-- With FAL_KEY empty, the chat endpoint intentionally returns a safe 503
-  "AI provider is not configured" error PLUS the retrieved source records.
+- Env vars: `FAL_KEY` (CONFIGURED in /app/.env), `CLAUDE_MODEL=anthropic/claude-sonnet-4.5`.
+- Live Claude via fal.ai (fal-ai/any-llm) is ACTIVE and verified: grounded
+  answers with [#] citations + source records. If FAL_KEY is ever removed, the
+  endpoint returns a safe 503 and still shows retrieved records.
 
 ## Database
 - PostgreSQL 15 (local), DATABASE_URL in /app/.env. Seeded with 12 synthetic
