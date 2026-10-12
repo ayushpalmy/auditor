@@ -1,0 +1,20 @@
+{
+  "summary": "Retest of /chat page after fix hoisting ReferenceTable outside the error/success ternary. All 6 criteria now pass: safe error alert AND source-records table render together with exactly 2 rows (INV-1002 $5,200.50 and INV-1001 $7,500.00, both Acme Corp). Regression confirmed: user bubble, loading indicator, Clear button reset, and disclaimer all work.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% (6/6 criteria)"},
+  "test_credentials": "none required (SELF_HOSTED_MODE)",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Chat page fix verified. ReferenceTable now renders in both success and error assistant branches. Error branch shows alert 'Unable to answer / The AI provider is not configured. Set FAL_KEY to enable chat.' plus a Source records (2) table with chat-reference-row-0 (INV-1002, 2026-03-18, Acme Corp, income, $5,200.50) and chat-reference-row-1 (INV-1001, 2026-03-05, Acme Corp, income, $7,500.00). Clear button correctly returns UI to chat-empty-state.",
+  "rca of the issue": "Previous iteration: ReferenceTable was rendered inside the success branch of an isError ternary in /app/components/chat/chat-view.tsx, so it was hidden when the API returned a 503 safe-error with references. Fix hoisted the ReferenceTable render outside the ternary; now it renders whenever message.references is non-empty, regardless of error state. Verified via live run: 503 returned, error alert visible, references table visible with correct 2 rows."
+}
