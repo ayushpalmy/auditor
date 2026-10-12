@@ -59,3 +59,8 @@ pgdata
 
 # Local git worktrees
 .worktrees/
+.env.*
+*.env
+credentials.json
+*.key
+.credentials
