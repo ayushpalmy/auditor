@@ -1,4 +1,5 @@
-import { RetrievedRecord } from "./retrieval"
+import type { RetrievedRecord } from "./retrieval"
+import type { MonthlySummary } from "./summary"
 
 export type ChatTurn = { role: "user" | "assistant"; content: string }
 
@@ -13,6 +14,7 @@ export function buildSystemPrompt(): string {
     "- Use ONLY the retrieved records. Never invent transactions, amounts, dates, suppliers, totals, or identifiers.",
     `- If the records section is "${NO_RECORDS_TOKEN}" or none of the records match the question, clearly say that no matching records were found. Do not guess.`,
     "- When you reference specific records, cite them by their [#N] index so the user can verify.",
+    "- If a PRECOMPUTED TOTALS section is present, use those exact figures for any sums, totals, or per-supplier breakdowns. Never recompute or estimate totals yourself.",
     "- Clearly separate figures taken from records from any assumption you make.",
     "- Amounts are already in each record's own currency. Do not convert between currencies.",
     "- Be concise and factual. Prefer short answers and small tables.",
@@ -43,15 +45,34 @@ function formatHistory(history: ChatTurn[]): string {
     .join("\n")
 }
 
-export function buildChatPrompt(question: string, records: RetrievedRecord[], history: ChatTurn[] = []): string {
-  return [
+export function formatSummariesForPrompt(summaries: MonthlySummary[]): string {
+  if (!summaries.length) return ""
+  const lines = summaries.map((s) => {
+    const suppliers = s.suppliers
+      .map((sup) => `${sup.merchant}: ${sup.total.toFixed(2)} ${s.currency} (${sup.count})`)
+      .join("; ")
+    return `- ${s.month} [${s.currency}] total=${s.total.toFixed(2)} across ${s.count} record(s) | by supplier: ${suppliers}`
+  })
+  return ["PRECOMPUTED TOTALS (authoritative — use these exact figures; never recompute):", ...lines].join("\n")
+}
+
+export function buildChatPrompt(
+  question: string,
+  records: RetrievedRecord[],
+  history: ChatTurn[] = [],
+  summaries: MonthlySummary[] = []
+): string {
+  const parts = [
     "CONVERSATION SO FAR:",
     formatHistory(history),
     "",
     "RETRIEVED RECORDS (only these may be used to answer):",
     formatRecordsForPrompt(records),
-    "",
-    "QUESTION:",
-    question,
-  ].join("\n")
+  ]
+  const summaryBlock = formatSummariesForPrompt(summaries)
+  if (summaryBlock) {
+    parts.push("", summaryBlock)
+  }
+  parts.push("", "QUESTION:", question)
+  return parts.join("\n")
 }

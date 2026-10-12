@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { splitCitations } from "@/lib/chat/citations"
 import { AlertTriangle, Eraser, Info, Loader2, Send } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
@@ -24,11 +25,21 @@ type Reference = {
   date: string | null
 }
 
+type SupplierTotal = { merchant: string; total: number; count: number }
+type MonthlySummary = {
+  month: string
+  currency: string
+  total: number
+  count: number
+  suppliers: SupplierTotal[]
+}
+
 type ChatMessage = {
   id: string
   role: "user" | "assistant"
   content: string
   references?: Reference[]
+  summary?: MonthlySummary[]
   noResults?: boolean
   isError?: boolean
 }
@@ -50,7 +61,15 @@ function formatAmount(amount: number | null, currency: string | null) {
   }
 }
 
-function ReferenceTable({ references }: { references: Reference[] }) {
+function ReferenceTable({
+  references,
+  messageId,
+  highlightId,
+}: {
+  references: Reference[]
+  messageId: string
+  highlightId: string | null
+}) {
   return (
     <div className="mt-3 rounded-md border bg-muted/30" data-testid="chat-references-block">
       <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
@@ -59,6 +78,7 @@ function ReferenceTable({ references }: { references: Reference[] }) {
       <Table data-testid="chat-references-table">
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[40px]">#</TableHead>
             <TableHead className="w-[90px]">Date</TableHead>
             <TableHead>Supplier</TableHead>
             <TableHead>Name</TableHead>
@@ -67,19 +87,102 @@ function ReferenceTable({ references }: { references: Reference[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {references.map((r, i) => (
-            <TableRow key={r.id} data-testid={`chat-reference-row-${i}`}>
-              <TableCell className="text-xs text-muted-foreground">{r.date ?? "—"}</TableCell>
-              <TableCell className="text-sm">{r.merchant ?? "—"}</TableCell>
-              <TableCell className="text-sm">{r.name ?? "—"}</TableCell>
-              <TableCell className="text-xs capitalize">{r.type}</TableCell>
-              <TableCell className="text-right text-sm tabular-nums">
-                {formatAmount(r.amount, r.currencyCode)}
-              </TableCell>
-            </TableRow>
-          ))}
+          {references.map((r, i) => {
+            const rowId = `ref-${messageId}-${i}`
+            const highlighted = highlightId === rowId
+            return (
+              <TableRow
+                key={r.id}
+                id={rowId}
+                data-testid={`chat-reference-row-${i}`}
+                className={
+                  highlighted ? "bg-amber-100 ring-2 ring-amber-400 transition-colors" : "transition-colors"
+                }
+              >
+                <TableCell className="text-xs text-muted-foreground">#{i + 1}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{r.date ?? "—"}</TableCell>
+                <TableCell className="text-sm">{r.merchant ?? "—"}</TableCell>
+                <TableCell className="text-sm">{r.name ?? "—"}</TableCell>
+                <TableCell className="text-xs capitalize">{r.type}</TableCell>
+                <TableCell className="text-right text-sm tabular-nums">
+                  {formatAmount(r.amount, r.currencyCode)}
+                </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
+    </div>
+  )
+}
+
+function SummaryTable({ summary }: { summary: MonthlySummary[] }) {
+  return (
+    <div className="mt-3 rounded-md border bg-muted/30" data-testid="chat-summary-block">
+      <div className="px-3 py-2 text-xs font-medium text-muted-foreground">Monthly breakdown (computed from your records)</div>
+      <Table data-testid="chat-summary-table">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Month</TableHead>
+            <TableHead>Supplier</TableHead>
+            <TableHead className="w-[70px] text-right">Count</TableHead>
+            <TableHead className="w-[130px] text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {summary.map((m, mi) =>
+            m.suppliers
+              .map((s, si) => (
+                <TableRow key={`${m.month}-${m.currency}-${s.merchant}`} data-testid={`chat-summary-supplier-row-${mi}-${si}`}>
+                  <TableCell className="text-xs text-muted-foreground">{si === 0 ? m.month : ""}</TableCell>
+                  <TableCell className="text-sm">{s.merchant}</TableCell>
+                  <TableCell className="text-right text-xs tabular-nums">{s.count}</TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">{formatAmount(s.total, m.currency)}</TableCell>
+                </TableRow>
+              ))
+              .concat(
+                <TableRow key={`${m.month}-${m.currency}-total`} data-testid={`chat-summary-month-total-${mi}`} className="font-medium">
+                  <TableCell className="text-xs text-muted-foreground">{m.month}</TableCell>
+                  <TableCell className="text-sm">Total ({m.count})</TableCell>
+                  <TableCell />
+                  <TableCell className="text-right text-sm tabular-nums">{formatAmount(m.total, m.currency)}</TableCell>
+                </TableRow>
+              )
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
+function AnswerText({
+  content,
+  referenceCount,
+  onCite,
+}: {
+  content: string
+  referenceCount: number
+  onCite: (index: number) => void
+}) {
+  const segments = splitCitations(content)
+  return (
+    <div className="whitespace-pre-wrap">
+      {segments.map((seg, i) => {
+        if (seg.type === "text") return <span key={i}>{seg.value}</span>
+        const inRange = seg.index >= 1 && seg.index <= referenceCount
+        if (!inRange) return <span key={i}>{seg.label}</span>
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onCite(seg.index)}
+            data-testid={`chat-citation-${seg.index}`}
+            className="mx-0.5 inline-flex items-center rounded bg-primary/10 px-1.5 py-0.5 align-baseline text-xs font-medium text-primary hover:bg-primary/20"
+          >
+            {seg.label}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -88,7 +191,18 @@ export function ChatView() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [highlightId, setHighlightId] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  function handleCite(messageId: string, index: number) {
+    const rowId = `ref-${messageId}-${index - 1}`
+    const el = document.getElementById(rowId)
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" })
+      setHighlightId(rowId)
+      window.setTimeout(() => setHighlightId((cur) => (cur === rowId ? null : cur)), 2500)
+    }
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
@@ -122,6 +236,7 @@ export function ChatView() {
             role: "assistant",
             content: data.answer || "",
             references: data.references || [],
+            summary: data.summary || [],
             noResults: data.noResults,
           },
         ])
@@ -218,7 +333,11 @@ export function ChatView() {
                   </Alert>
                 ) : (
                   <div className="rounded-lg border bg-muted/40 px-4 py-3 text-sm">
-                    <div className="whitespace-pre-wrap">{m.content}</div>
+                    <AnswerText
+                      content={m.content}
+                      referenceCount={m.references?.length || 0}
+                      onCite={(index) => handleCite(m.id, index)}
+                    />
                     {m.noResults && (
                       <div
                         className="mt-3 flex items-center gap-2 rounded-md bg-amber-100 px-3 py-2 text-xs text-amber-900"
@@ -230,8 +349,9 @@ export function ChatView() {
                     )}
                   </div>
                 )}
+                {m.summary && m.summary.length > 0 && <SummaryTable summary={m.summary} />}
                 {m.references && m.references.length > 0 && (
-                  <ReferenceTable references={m.references} />
+                  <ReferenceTable references={m.references} messageId={m.id} highlightId={highlightId} />
                 )}
               </div>
             </div>

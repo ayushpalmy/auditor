@@ -3,6 +3,7 @@ import { askClaude, FalConfigError, FalProviderError } from "@/lib/chat/fal-clau
 import { buildChatPrompt, buildSystemPrompt, ChatTurn } from "@/lib/chat/prompt"
 import { parseQuery } from "@/lib/chat/query-parser"
 import { RetrievedRecord, retrieveTransactions } from "@/lib/chat/retrieval"
+import { computeMonthlySummaries, MonthlySummary } from "@/lib/chat/summary"
 import { getUserById } from "@/models/users"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -12,6 +13,7 @@ type ChatResponse = {
   success: boolean
   answer?: string
   references?: RetrievedRecord[]
+  summary?: MonthlySummary[]
   noResults?: boolean
   error?: string
 }
@@ -65,17 +67,24 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
 
   // 3) Firm (user)-scoped, read-only retrieval.
   let records: RetrievedRecord[]
+  let parsed
   try {
-    const parsed = parseQuery(lastUser.content)
+    parsed = parseQuery(lastUser.content)
     records = await retrieveTransactions(user.id, parsed)
   } catch (err) {
     console.error("[chat] retrieval failed:", err instanceof Error ? err.name : "unknown")
     return NextResponse.json({ success: false, error: "Failed to search your records" }, { status: 500 })
   }
 
+  // Deterministic, code-computed summaries (never AI math) when the user asks
+  // for a spending/income summary or breakdown.
+  const summaries: MonthlySummary[] = parsed.summary
+    ? computeMonthlySummaries(records, { type: parsed.type === "income" ? "income" : "expense" })
+    : []
+
   // 4) Call Claude via fal.ai with strictly grounded context.
   const history = messages.slice(0, messages.lastIndexOf(lastUser))
-  const prompt = buildChatPrompt(lastUser.content, records, history)
+  const prompt = buildChatPrompt(lastUser.content, records, history, summaries)
 
   try {
     const answer = await askClaude({ system: buildSystemPrompt(), prompt })
@@ -83,15 +92,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
       success: true,
       answer,
       references: records,
+      summary: summaries,
       noResults: records.length === 0,
     })
   } catch (err) {
     if (err instanceof FalConfigError) {
-      return NextResponse.json({ success: false, error: err.message, references: records }, { status: 503 })
+      return NextResponse.json(
+        { success: false, error: err.message, references: records, summary: summaries },
+        { status: 503 }
+      )
     }
     if (err instanceof FalProviderError) {
       console.error("[chat] provider error:", err.message)
-      return NextResponse.json({ success: false, error: err.message, references: records }, { status: 502 })
+      return NextResponse.json(
+        { success: false, error: err.message, references: records, summary: summaries },
+        { status: 502 }
+      )
     }
     console.error("[chat] unexpected error")
     return NextResponse.json({ success: false, error: "Something went wrong. Please try again." }, { status: 500 })

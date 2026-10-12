@@ -14,6 +14,7 @@ export type RetrievedRecord = {
   name: string | null
   description: string | null
   amount: number | null // major units (total is stored in cents)
+  amountCents: number | null // raw integer cents, for exact arithmetic
   currencyCode: string | null
   date: string | null // YYYY-MM-DD
   categoryCode: string | null
@@ -71,6 +72,7 @@ export function normalizeTransaction(t: Transaction): RetrievedRecord {
     name: t.name ?? null,
     description: t.description ?? null,
     amount: t.total != null ? t.total / 100 : null,
+    amountCents: t.total ?? null,
     currencyCode: t.currencyCode ?? null,
     date: t.issuedAt ? t.issuedAt.toISOString().slice(0, 10) : null,
     categoryCode: t.categoryCode ?? null,

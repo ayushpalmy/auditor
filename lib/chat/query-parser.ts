@@ -9,6 +9,7 @@ export type ParsedQuery = {
   dateFrom?: string // YYYY-MM-DD
   dateTo?: string // YYYY-MM-DD
   type?: "income" | "expense"
+  summary?: boolean // user is asking for a spending/income summary or breakdown
 }
 
 const MONTHS: Record<string, number> = {
@@ -39,6 +40,9 @@ const NOISE_WORDS = new Set([
   "month", "week", "day", "expense", "expenses", "income", "revenue", "revenues",
   "sales", "sale", "purchase", "purchases", "than", "money", "dollars", "dollar",
   "we", "they", "it", "i",
+  "summary", "summaries", "summarize", "summarise", "breakdown", "overview",
+  "monthly", "spending", "spend", "spends", "supplier", "suppliers", "vendor",
+  "vendors", "per", "each", "earnings", "earned", "made", "invoiced",
 ])
 
 function toNumber(raw: string): number | undefined {
@@ -147,6 +151,12 @@ function parseTerms(original: string): string[] {
   return terms
 }
 
+function parseSummaryIntent(q: string): boolean {
+  return /\b(summary|summaries|summarize|summarise|breakdown|broken down|per month|by month|monthly|each month|per supplier|by supplier|per vendor|by vendor)\b/.test(
+    q
+  ) || /how much.*(spend|spent|earn|earned|made|invoiced)/.test(q) || /total.*(spend|spent|spending|income|revenue)/.test(q)
+}
+
 export function parseQuery(question: string, now: Date = new Date()): ParsedQuery {
   const q = (question || "").toLowerCase()
   const { dateFrom, dateTo } = parseDates(q, now)
@@ -158,5 +168,6 @@ export function parseQuery(question: string, now: Date = new Date()): ParsedQuer
     dateFrom,
     dateTo,
     type: parseType(q),
+    summary: parseSummaryIntent(q),
   }
 }
