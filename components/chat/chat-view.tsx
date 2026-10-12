@@ -228,10 +228,10 @@ export function ChatView() {
                         No matching records were found for this question.
                       </div>
                     )}
-                    {m.references && m.references.length > 0 && (
-                      <ReferenceTable references={m.references} />
-                    )}
                   </div>
+                )}
+                {m.references && m.references.length > 0 && (
+                  <ReferenceTable references={m.references} />
                 )}
               </div>
             </div>

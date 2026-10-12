@@ -1,0 +1,33 @@
+{
+  "summary": "Frontend-only end-to-end UI test of the /chat (AI Assistant) page in TaxHacker. The page hydrates and is interactive: sidebar link navigates, disclaimer visible, empty state visible, Send button correctly disabled until input is entered, typing persists in the Textarea, submitting creates a chat-message-user bubble, chat-loading indicator shows while waiting, and the backend returns 503 (FAL_KEY not configured) which is rendered as a chat-error alert (text: 'The AI provider is not configured. Set FAL_KEY to enable chat.') inside a chat-message-assistant block. Clear button resets conversation back to the empty state. ONE SPEC MISMATCH FOUND: the references table (chat-references-table) is NOT rendered beneath the error alert, even though the backend response includes the 2 Acme Corp March invoices in `references`. The chat-view component only renders references in the non-error branch.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "components/chat/chat-view.tsx",
+        "issue": "References table is NOT rendered when an assistant message has isError=true. The review_request explicitly requires that on FAL_KEY-not-configured errors, the chat-references-table should still render beneath the chat-error alert with the 2 Acme Corp March invoices. Currently the references array returned by the API (res.ok=false, data.references=[2 rows]) is stored on the message but the JSX only renders <ReferenceTable/> inside the non-error branch (line 231-233), so users see only the error alert and no source records.",
+        "selector": "[data-testid=\"chat-references-table\"]",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix /app/components/chat/chat-view.tsx: move/duplicate the `{m.references && m.references.length > 0 && <ReferenceTable .../>}` block so it also renders when `m.isError` is true (e.g., render it below the <Alert/> inside the same assistant container, OR hoist it outside the isError ternary). This is required so that firm-scoped retrieval results are still shown to the user even when the Claude call fails because FAL_KEY is empty."
+  ],
+  "critical_code_review_comments": [
+    "chat-view.tsx: references stored on error messages are effectively dead state (set in state at line 135 but never rendered). Either render them in the error branch or remove them from state to avoid confusion.",
+    "chat-view.tsx: on fetch catch block (network error) no references are attached, which is fine, but consider surfacing a distinct selector for the network-error vs provider-error cases.",
+    "Payload shape: backend expects {messages: [...]} not {message: '...'} — fine for FE but could be documented."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (per request)", "frontend": "85% (5 of 6 acceptance criteria met; references-on-error criterion failed)"},
+  "test_credentials": "Not required (SELF_HOSTED_MODE, auto user taxhacker@localhost).",
+  "seed_data_creation": "None created — relied on existing seeded demo data; backend confirmed to contain the two Acme March invoices (INV-1001 $7,500 and INV-1002 $5,200.50) based on prior curl verification by main agent.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Chat UI hydrates fine through the preview URL. All data-testid hooks exist and work. Only remaining issue is rendering of chat-references-table in the error path (isError branch of chat-view.tsx). After the fix, re-run the same Playwright script that submits the Acme question and assert that both [data-testid=chat-error] and [data-testid=chat-references-table] are present and that there are exactly 2 chat-reference-row-* rows mentioning INV-1001 and INV-1002.",
+  "rca of the issue": "RCA: In /app/components/chat/chat-view.tsx the assistant-message JSX uses a ternary on `m.isError`. The ReferenceTable render (lines 231-233) is placed inside the FALSY branch (non-error) only. Even though sendMessage() stores `references: data.references || []` on error messages (line 135), that state is never consumed in the error branch (line 213-218 only renders the Alert). Reproduction: load /chat, type 'Show me Acme invoices from March over 5,000', click Send; backend returns 503 {success:false, error:'The AI provider is not configured...', references:[2 items]}; UI shows chat-error alert but no chat-references-table. Mitigation: render the <ReferenceTable/> block (and optionally the chat-no-results block) outside the ternary so it renders regardless of error state."
+}
