@@ -8,8 +8,8 @@
 - Preview URL: https://c840c2e3-b8a8-4480-b89e-8f74dc2c2c88.preview.emergentagent.com
 
 ## Authentication
-- `SELF_HOSTED_MODE=true` → NO login required. Every request is automatically
-  resolved to the single self-hosted user `taxhacker@localhost`.
+- `SELF_HOSTED_MODE=true` → NO login required. Auto-resolved to single self-hosted
+  user `taxhacker@localhost` (email kept as a technical identifier; display name is "Auditor").
 - There is no firm/organization model in TaxHacker; data isolation is per-user
   (userId). The authenticated user IS the firm boundary.
 
@@ -20,5 +20,10 @@
   endpoint returns a safe 503 and still shows retrieved records.
 
 ## Database
-- PostgreSQL 15 (local), DATABASE_URL in /app/.env. Seeded with 12 synthetic
-  demo transactions for `taxhacker@localhost` via `npx tsx scripts/seed-demo.mts`.
+- PostgreSQL 15 (local), DATABASE_URL in /app/.env. Role `taxhacker`/`taxhacker`.
+- ⚠️ PGDATA lives in /var/lib/postgresql (OUTSIDE the persistent /app,/root paths),
+  so a pod restart can reset the DB. Recovery:
+  `pg_ctlcluster 15 main start` → `su postgres -c "psql -c \"ALTER USER taxhacker WITH PASSWORD 'taxhacker';\""`
+  (create role/db if missing) → `npx prisma migrate deploy` → `npx tsx scripts/seed-demo.mts`.
+- Seeded with 12 synthetic demo transactions for `taxhacker@localhost`.
+- App branding is "Auditor" (rebrand of open-source TaxHacker by vas3k, MIT).
