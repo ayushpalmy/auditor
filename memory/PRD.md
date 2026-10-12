@@ -57,6 +57,22 @@ strict server-side firm/user scoping. Do not deploy. Keep budget < 100 credits.
   tests rather than two live logins.
 - No persistent chat history (session-only, per spec).
 
+## Enhancements (2026-06, verified by testing agent iteration_4)
+- **Clickable citations**: `[#N]` tokens in answers render as clickable chips
+  (`lib/chat/citations.ts` splitCitations — resilient to single `[#1]`, grouped
+  `[#1, #2]`, and range `[#1-#3]` forms). Clicking scrolls to and amber-highlights
+  the matching source row (`ref-<messageId>-<N-1>`). System prompt also requests
+  one-bracket-per-citation (defense in depth).
+- **Monthly summaries**: `lib/chat/summary.ts` computeMonthlySummaries — integer-cent
+  arithmetic, per-supplier breakdown, de-duped by record id, skips null date/amount,
+  separates currencies, income/expense filter. Triggered by summary-intent queries;
+  figures injected into the prompt as authoritative "PRECOMPUTED TOTALS" (AI never
+  does the math) and rendered as `chat-summary-table`. Verified exact: Mar 2026
+  $540.74 (Umbrella $450.75 + Office Depot $89.99), Jan $120, Nov 2025 $2,300.
+- Tests now 79/79 pass (added summary.test.ts + citations.test.ts).
+
 ## Backlog / next
-- Enable live Claude once FAL_KEY is supplied; verify grounded answer + citations.
-- Optional: amount/date chips in UI; richer multi-type result grouping.
+- Result grouping (invoices vs receipts vs transactions sections) — deferred per user.
+- Filter chips — deferred per user.
+- Summaries are computed over the retrieved set (capped at RETRIEVAL_LIMIT=25);
+  for very large months consider a dedicated aggregate query.
